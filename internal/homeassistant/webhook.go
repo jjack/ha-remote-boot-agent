@@ -2,10 +2,10 @@ package homeassistant
 
 // Message payload for sending to Home Assistant
 type WebhookPayload struct {
-	DeviceID      string                 `json:"device_id"`
-	Bootloader    string                 `json:"bootloader"`
-	InitSystem    string                 `json:"init_system"`
-	BootOptions   map[string]interface{} `json:"boot_options"`
+	DeviceID    string                 `json:"device_id"`
+	Bootloader  string                 `json:"bootloader"`
+	InitSystem  string                 `json:"init_system"`
+	BootOptions map[string]interface{} `json:"boot_options"`
 	// Additional payload parts
 }
 
