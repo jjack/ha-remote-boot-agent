@@ -20,7 +20,6 @@ type HAPayload struct {
 
 type Client struct {
 	BaseURL   string
-	Token     string
 	WebhookID string
 }
 
@@ -31,7 +30,6 @@ func NewClient(cfg config.HAConfig) *Client {
 	}
 	return &Client{
 		BaseURL:   strings.TrimRight(cfg.BaseURL, "/"),
-		Token:     cfg.Token,
 		WebhookID: webhookID,
 	}
 }
@@ -41,10 +39,6 @@ func (c *Client) GetSelectedOS(mac string) (string, error) {
 	req, err := http.NewRequest("GET", endpoint, nil)
 	if err != nil {
 		return "", fmt.Errorf("error creating request: %w", err)
-	}
-
-	if c.Token != "" {
-		req.Header.Set("Authorization", "Bearer "+c.Token)
 	}
 
 	resp, err := http.DefaultClient.Do(req)
@@ -76,10 +70,6 @@ func (c *Client) PushAvailableOSes(payload HAPayload) error {
 		return fmt.Errorf("error creating request: %w", err)
 	}
 	req.Header.Set("Content-Type", "application/json")
-
-	if c.Token != "" {
-		req.Header.Set("Authorization", "Bearer "+c.Token)
-	}
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {

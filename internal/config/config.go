@@ -22,7 +22,6 @@ type HostConfig struct {
 
 type HAConfig struct {
 	BaseURL   string `mapstructure:"url"`
-	Token     string `mapstructure:"token"`
 	WebhookID string `mapstructure:"webhook_id"`
 }
 
@@ -34,7 +33,6 @@ func InitFlags(flags *pflag.FlagSet) {
 	flags.String("hostname", "", "Hostname of the device (optional, will be auto-detected if not provided)")
 
 	flags.String("homeassistant-url", "", "Home Assistant Base URL")
-	flags.String("homeassistant-token", "", "Home Assistant Long-Lived Access Token")
 	flags.String("homeassistant-webhook-id", "remote_boot_manager_ingest", "Home Assistant Webhook ID")
 }
 
@@ -47,7 +45,6 @@ func Load(flags *pflag.FlagSet) (*Config, error) {
 	v.BindPFlag("host.mac_address", flags.Lookup("mac-address"))
 	v.BindPFlag("host.hostname", flags.Lookup("hostname"))
 	v.BindPFlag("homeassistant.url", flags.Lookup("homeassistant-url"))
-	v.BindPFlag("homeassistant.token", flags.Lookup("homeassistant-token"))
 	v.BindPFlag("homeassistant.webhook_id", flags.Lookup("homeassistant-webhook-id"))
 
 	v.SetDefault("homeassistant.webhook_id", "remote_boot_manager_ingest")
