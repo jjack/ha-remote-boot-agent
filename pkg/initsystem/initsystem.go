@@ -3,7 +3,8 @@ package initsystem
 // InitSystem defines the interface for init system plugins.
 type InitSystem interface {
 	Name() string
-	RunningServices() ([]string, error)
+	// Detect returns true if this init system is active on the host
+	Detect() bool
 	// Add more methods interacting with init systems...
 }
 
@@ -25,4 +26,14 @@ func Register(name string, plugin InitSystem) {
 func Get(name string) (InitSystem, bool) {
 	p, ok := plugins[name]
 	return p, ok
+}
+
+// Detect iterates over all registered plugins and returns the name of the first one that detects itself.
+func Detect() string {
+	for name, plugin := range plugins {
+		if plugin.Detect() {
+			return name
+		}
+	}
+	return ""
 }

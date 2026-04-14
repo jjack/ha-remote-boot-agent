@@ -1,8 +1,10 @@
 package bootloader
 
+import "github.com/jjack/remote-boot-agent/pkg/config"
+
 // BootOptions represents the parsed boot configuration.
 type BootOptions struct {
-	KernelPaths []string
+	AvailableOSes []string
 	Parameters  map[string]string
 	// Add other relevant fields
 }
@@ -11,8 +13,10 @@ type BootOptions struct {
 type Bootloader interface {
 	// Name returns the name of the bootloader plugin.
 	Name() string
+	// Detect returns true if this bootloader is detected as the active/available one on the system.
+	Detect() bool
 	// Parse parses the bootloader configuration and returns the options.
-	Parse() (*BootOptions, error)
+	Parse(cfg *config.Config) (*BootOptions, error)
 	// Add other necessary methods (e.g., SetNextBoot)
 }
 
@@ -34,4 +38,14 @@ func Register(name string, plugin Bootloader) {
 func Get(name string) (Bootloader, bool) {
 	p, ok := plugins[name]
 	return p, ok
+}
+
+// Detect iterates over all registered plugins and returns the name of the first one that detects itself.
+func Detect() string {
+	for name, plugin := range plugins {
+		if plugin.Detect() {
+			return name
+		}
+	}
+	return ""
 }

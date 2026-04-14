@@ -12,24 +12,31 @@ type Config struct {
 	BootloaderName string `mapstructure:"bootloader"`
 	InitSystemName string `mapstructure:"init_system"`
 	HAWebhookURL   string `mapstructure:"ha_webhook_url"`
-	// Device or hostname
+	Hostname       string `mapstructure:"hostname"`
+	MACAddress     string `mapstructure:"mac_address"`
+}
+
+func InitFlags(flags *pflag.FlagSet) {
+	flags.String("config", "", "Explicit config file path (default is /etc/remote-boot-agent/config.yaml)")
+	flags.String("bootloader", "", "Name of the bootloader to use (optional, will be auto-detected if not provided)")
+	flags.String("init-system", "", "Name of the init system to use (optional, will be auto-detected if not provided)")
+	flags.String("mac-address", "", "MAC address of the device (optional, will be auto-detected if not provided)")
+	flags.String("hostname", "", "Hostname of the device (optional, will be auto-detected if not provided)")
+
+	flags.String("homeassistant-url", "", "Home Assistant Base URL")
+	flags.String("homeassistant-token", "", "Home Assistant Long-Lived Access Token")
+
+	viper.BindPFlag("bootloader", flags.Lookup("bootloader"))
+	viper.BindPFlag("init_system", flags.Lookup("init-system"))
+	viper.BindPFlag("mac_address", flags.Lookup("mac-address"))
+	viper.BindPFlag("hostname", flags.Lookup("hostname"))
+	viper.BindPFlag("home_assistant_url", flags.Lookup("homeassistant-url"))
+	viper.BindPFlag("home_assistant_auth_token", flags.Lookup("homeassistant-token"))
 }
 
 // Load reads and parses configuration for the CLI application
-func Load() (*Config, error) {
-	pflag.String("config", "", "Explicit config file path (default is /etc/remote-boot-agent/config.yaml)")
-	pflag.String("bootloader", "grub", "Name of the bootloader to use (default: grub)")
-	pflag.String("init-system", "systemd", "Name of the init system to use (default: systemd)")
-	pflag.String("homeassistant-url", "", "Home Assistant Base URL")
-	pflag.String("homeassistant-token", "", "Home Assistant Long-Lived Access Token")
-	pflag.Parse()
-
-	viper.BindPFlag("bootloader", pflag.Lookup("bootloader"))
-	viper.BindPFlag("init_system", pflag.Lookup("init-system"))
-	viper.BindPFlag("home_assistant_url", pflag.Lookup("homeassistant-url"))
-	viper.BindPFlag("home_assistant_auth_token", pflag.Lookup("homeassistant-token"))
-
-	cfgFile, _ := pflag.CommandLine.GetString("config")
+func Load(flags *pflag.FlagSet) (*Config, error) {
+	cfgFile, _ := flags.GetString("config")
 	if cfgFile != "" {
 		// Use config file from the flag
 		viper.SetConfigFile(cfgFile)
@@ -53,6 +60,25 @@ func Load() (*Config, error) {
 	var cfg Config
 	if err := viper.Unmarshal(&cfg); err != nil {
 		return nil, fmt.Errorf("unable to decode into config struct: %w", err)
+	}
+
+	// ----------------------------------------------------
+	// Auto-discovery logic for omitted essential fields
+	// ----------------------------------------------------
+
+	// (We import bootloader conceptually here. Since this is the config package,
+	// depending on bootloader/initsystem causes import cycles. We will auto-detect
+	// from main instead, or inject callbacks).
+	
+	// Discover Hardware network info if missing
+	if cfg.Hostname == "" || cfg.MACAddress == "" {
+		host, mac := discoverNetworkInfo()
+		if cfg.Hostname == "" {
+			cfg.Hostname = host
+		}
+		if cfg.MACAddress == "" {
+			cfg.MACAddress = mac
+		}
 	}
 
 	return &cfg, nil

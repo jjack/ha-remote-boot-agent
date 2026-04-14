@@ -1,10 +1,12 @@
 package systemd
 
 import (
-	"log"
+	"os"
 
 	"github.com/jjack/remote-boot-agent/pkg/initsystem"
 )
+
+const SYSTEMD_PATH = "/run/systemd/system"
 
 type SystemdPlugin struct {
 	// configuration fields
@@ -18,8 +20,10 @@ func (p *SystemdPlugin) Name() string {
 	return "systemd"
 }
 
-func (p *SystemdPlugin) RunningServices() ([]string, error) {
-	log.Println("Querying systemd for services...")
-	// TODO: implement logic
-	return []string{}, nil
+func (p *SystemdPlugin) Detect() bool {
+	if _, err := os.Stat(SYSTEMD_PATH); err == nil {
+		return true
+	}
+
+	return false
 }
