@@ -6,9 +6,7 @@ import (
 
 const systemdPath = "/run/systemd/system"
 
-type SystemdPlugin struct {
-	// configuration fields
-}
+type SystemdPlugin struct {}
 
 func New() *SystemdPlugin {
 	return &SystemdPlugin{}

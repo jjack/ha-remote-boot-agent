@@ -4,7 +4,6 @@ package bootloader
 type BootOptions struct {
 	AvailableOSes []string
 	Parameters    map[string]string
-	// Add other relevant fields
 }
 
 // Plugin defines the interface for all bootloader plugins.
@@ -15,7 +14,6 @@ type Plugin interface {
 	Detect() bool
 	// Parse parses the bootloader configuration and returns the options.
 	Parse(configPath string) (*BootOptions, error)
-	// Add other necessary methods (e.g., SetNextBoot)
 }
 
 // Registry manages the available bootloader plugins
