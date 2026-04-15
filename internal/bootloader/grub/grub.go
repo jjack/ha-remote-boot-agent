@@ -3,7 +3,7 @@ package grub
 import (
 	"bufio"
 	"fmt"
-	"log"
+	"log/slog"
 	"os"
 	"regexp"
 	"strings"
@@ -49,21 +49,21 @@ func findGrubConfig() (string, error) {
 }
 
 func (p *GrubPlugin) Parse(cfg *config.Config) (*bootloader.BootOptions, error) {
-	log.Println("Parsing GRUB boot options...")
+	slog.Info("Parsing GRUB boot options...")
 
 	var grubPath string
 	var err error
 
 	if cfg != nil && cfg.Host.BootloaderConfigPath != "" {
 		grubPath = cfg.Host.BootloaderConfigPath
-		log.Printf("Using explicit GRUB config path: %s\n", grubPath)
+		slog.Info("Using explicit GRUB config path", slog.String("path", grubPath))
 	} else {
 		grubPath, err = findGrubConfig()
 		if err != nil {
 			return nil, fmt.Errorf("failed to locate grub config: %w", err)
 		}
 	}
-	log.Printf("Found GRUB config at: %s\n", grubPath)
+	slog.Info("Found GRUB config at", slog.String("path", grubPath))
 
 	file, err := os.Open(grubPath)
 	if err != nil {

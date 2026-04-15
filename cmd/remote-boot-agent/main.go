@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log/slog"
 	"os"
 
 	"github.com/jjack/remote-boot-agent/internal/bootloader"
@@ -49,7 +50,7 @@ func buildCommands(blReg *bootloader.Registry, initReg *initsystem.Registry) *co
 			if err != nil {
 				return err
 			}
-			fmt.Printf("%s\n", osName)
+			slog.Info("Selected OS from Home Assistant", slog.String("os", osName))
 			return nil
 		},
 	}
@@ -69,7 +70,7 @@ func buildCommands(blReg *bootloader.Registry, initReg *initsystem.Registry) *co
 			}
 
 			for _, osName := range opts.AvailableOSes {
-				fmt.Printf("%s\n", osName)
+				slog.Info("Available OS", slog.String("os", osName))
 			}
 			return nil
 		},
