@@ -19,9 +19,7 @@ var grubPaths = []string{
 	"/boot/efi/EFI/ubuntu/grub.cfg",
 }
 
-type GrubPlugin struct {
-	// Add config for the grub plugin here
-}
+type GrubPlugin struct {}
 
 func New() *GrubPlugin {
 	return &GrubPlugin{}
