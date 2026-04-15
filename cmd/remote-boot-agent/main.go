@@ -8,21 +8,16 @@ import (
 	"github.com/jjack/remote-boot-agent/internal/bootloader/grub"
 	"github.com/jjack/remote-boot-agent/internal/config"
 	"github.com/jjack/remote-boot-agent/internal/homeassistant"
-	"github.com/jjack/remote-boot-agent/internal/initsystem"
-	"github.com/jjack/remote-boot-agent/internal/initsystem/systemd"
 	"github.com/spf13/cobra"
 )
 
-func setDefaults(cfg *config.Config, blReg *bootloader.Registry, initReg *initsystem.Registry) {
+func setDefaults(cfg *config.Config, blReg *bootloader.Registry) {
 	if cfg.Host.Bootloader == "" {
 		cfg.Host.Bootloader = blReg.Detect()
 	}
-	if cfg.Host.InitSystem == "" {
-		cfg.Host.InitSystem = initReg.Detect()
-	}
 }
 
-func buildCommands(blReg *bootloader.Registry, initReg *initsystem.Registry) *cobra.Command {
+func buildCommands(blReg *bootloader.Registry) *cobra.Command {
 	var loadedConfig *config.Config
 
 	var rootCmd = &cobra.Command{
@@ -33,12 +28,11 @@ func buildCommands(blReg *bootloader.Registry, initReg *initsystem.Registry) *co
 			if err != nil {
 				return fmt.Errorf("error loading config: %w", err)
 			}
-			setDefaults(cfg, blReg, initReg)
+			setDefaults(cfg, blReg)
 			loadedConfig = cfg
 			return nil
 		},
 	}
-	config.InitFlags(rootCmd.PersistentFlags())
 
 	var getSelectedOSCmd = &cobra.Command{
 		Use:   "get-selected-os",
@@ -110,9 +104,8 @@ func buildCommands(blReg *bootloader.Registry, initReg *initsystem.Registry) *co
 
 func main() {
 	blReg := bootloader.NewRegistry(grub.New())
-	initReg := initsystem.NewRegistry(systemd.New())
 
-	rootCmd := buildCommands(blReg, initReg)
+	rootCmd := buildCommands(blReg)
 
 	if err := rootCmd.Execute(); err != nil {
 		os.Exit(1)
