@@ -37,7 +37,7 @@ func TestLoadConfig(t *testing.T) {
 func TestLoadConfigDefaults(t *testing.T) {
 	tempDir := t.TempDir()
 	configPath := filepath.Join(tempDir, "empty.yaml")
-	os.WriteFile(configPath, []byte(""), 0644)
+	_ = os.WriteFile(configPath, []byte(""), 0644)
 
 	cfg, err := LoadConfig(configPath)
 	if err != nil {
