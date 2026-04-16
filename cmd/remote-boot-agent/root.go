@@ -39,6 +39,12 @@ func NewCLI() *CLI {
 			if blConfig, _ := cmd.Flags().GetString("bootloader-config"); blConfig != "" {
 				cfg.Bootloader.ConfigPath = blConfig
 			}
+			if haURL, _ := cmd.Flags().GetString("ha-url"); haURL != "" {
+				cfg.HomeAssistant.URL = haURL
+			}
+			if haWebhook, _ := cmd.Flags().GetString("ha-webhook"); haWebhook != "" {
+				cfg.HomeAssistant.WebhookID = haWebhook
+			}
 
 			if cfg.Host.MACAddress == "" {
 				mac, err := system.DetectMACAddress()
@@ -66,6 +72,8 @@ func NewCLI() *CLI {
 	rootCmd.PersistentFlags().String("hostname", "", "Hostname override")
 	rootCmd.PersistentFlags().String("bootloader", "", "Bootloader override (e.g., grub)")
 	rootCmd.PersistentFlags().String("bootloader-config", "", "Bootloader config path override")
+	rootCmd.PersistentFlags().String("ha-url", "", "Home Assistant URL override")
+	rootCmd.PersistentFlags().String("ha-webhook", "", "Home Assistant Webhook ID override")
 
 	rootCmd.AddCommand(GetOSList(cli))
 	rootCmd.AddCommand(PushOSes(cli))
