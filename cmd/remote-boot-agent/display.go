@@ -2,13 +2,14 @@ package main
 
 import (
 	"fmt"
+
 	"github.com/jjack/remote-boot-agent/internal/bootloader"
 	"github.com/spf13/cobra"
 )
 
-func newGetAvailableOSesCmd(blReg *bootloader.Registry) *cobra.Command {
+func newDisplayCmd(blReg *bootloader.Registry) *cobra.Command {
 	return &cobra.Command{
-		Use:   "get-available-oses",
+		Use:   "display",
 		Short: "Output the list of available OSes from the bootloader",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			bl, ok := blReg.Get(loadedConfig.Host.Bootloader)

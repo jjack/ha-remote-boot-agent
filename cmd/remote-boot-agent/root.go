@@ -32,7 +32,7 @@ func newRootCmd(blReg *bootloader.Registry) *cobra.Command {
 	}
 
 	cmd.AddCommand(newGetSelectedOSCmd())
-	cmd.AddCommand(newGetAvailableOSesCmd(blReg))
+	cmd.AddCommand(newDisplayCmd(blReg))
 	cmd.AddCommand(newPushAvailableOSesCmd(blReg))
 
 	return cmd
