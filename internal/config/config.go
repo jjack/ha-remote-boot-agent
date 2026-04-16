@@ -45,6 +45,9 @@ func LoadConfig(cfgFile string) (*Config, error) {
 	v.SetEnvPrefix("RBA")
 	v.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 
+	v.SetDefault("homeassistant.url", "http://homeassistant.local:8123")
+	v.SetDefault("homeassistant.webhook_id", "remote_boot_manager_ingest")
+
 	if err := v.ReadInConfig(); err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); !ok && !os.IsNotExist(err) {
 			return nil, fmt.Errorf("failed to read config file: %w", err)
