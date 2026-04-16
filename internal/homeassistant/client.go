@@ -56,7 +56,7 @@ func (c *Client) Push(ctx context.Context, payload PushPayload) error {
 	if err != nil {
 		return fmt.Errorf("request to home assistant failed: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
 		return fmt.Errorf("unexpected status code received from home assistant: %d", resp.StatusCode)
@@ -81,7 +81,7 @@ func (c *Client) View(ctx context.Context, bootloader string, mac_address string
 	if err != nil {
 		return "", fmt.Errorf("request to home assistant failed: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
 		return "", fmt.Errorf("unexpected status code received from home assistant: %d", resp.StatusCode)

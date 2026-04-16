@@ -13,7 +13,7 @@ import (
 
 func TestGetSelectedOSCommand(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("Ubuntu"))
+		_, _ = w.Write([]byte("Ubuntu"))
 	}))
 	defer ts.Close()
 
@@ -41,7 +41,7 @@ func TestGetSelectedOSCommand(t *testing.T) {
 
 	err := cmd.Execute()
 
-	w.Close()
+	_ = w.Close()
 	os.Stdout = oldStdout
 
 	if err != nil {

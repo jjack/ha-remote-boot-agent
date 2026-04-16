@@ -28,7 +28,7 @@ func TestGetOSListCommand(t *testing.T) {
 
 	err := cmd.Execute()
 
-	w.Close()
+	_ = w.Close()
 	os.Stdout = oldStdout
 
 	if err != nil {

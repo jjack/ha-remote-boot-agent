@@ -67,7 +67,7 @@ func (g *Grub) GetOSList(configPath string) ([]string, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to open grub config %s: %w", grubPath, err)
 	}
-	defer file.Close()
+	defer func() { _ = file.Close() }()
 
 	// TODO: add support for submenu entries and other variations (will need to track nesting levels)
 	var options []string
