@@ -39,3 +39,5 @@ go.work.sum
 *.swp
 *.swo
 *.DS_Store
+# Added by goreleaser init:
+dist/
