@@ -1,6 +1,6 @@
 module github.com/jjack/remote-boot-agent
 
-go 1.24.4
+go 1.26.2
 
 require (
 	github.com/spf13/cobra v1.10.2
