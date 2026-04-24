@@ -29,7 +29,7 @@ type HomeAssistantConfig struct {
 	WebhookID string `mapstructure:"webhook_id"`
 }
 
-func LoadConfig(cfgFile string) (*Config, error) {
+func Load(cfgFile string) (*Config, error) {
 	v := viper.New()
 	if cfgFile != "" {
 		v.SetConfigFile(cfgFile)
@@ -44,9 +44,6 @@ func LoadConfig(cfgFile string) (*Config, error) {
 	v.AutomaticEnv()
 	v.SetEnvPrefix("RBA")
 	v.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
-
-	v.SetDefault("homeassistant.url", "http://homeassistant.local:8123")
-	v.SetDefault("homeassistant.webhook_id", "remote_boot_manager_ingest")
 
 	if err := v.ReadInConfig(); err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); !ok && !os.IsNotExist(err) {
