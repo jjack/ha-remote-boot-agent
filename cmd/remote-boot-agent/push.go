@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"log/slog"
 
 	ha "github.com/jjack/remote-boot-agent/internal/homeassistant"
 
@@ -40,7 +41,7 @@ func PushBootOptions(cli *CLI) *cobra.Command {
 				cli.Config.HomeAssistant.WebhookID,
 			)
 
-			fmt.Printf("Pushing state to Home Assistant (Webhook ID: %s)\n", cli.Config.HomeAssistant.WebhookID)
+			slog.Info("Pushing boot options to Home Assistant", "webhook_id", cli.Config.HomeAssistant.WebhookID)
 
 			if err := haClient.Push(context.Background(), payload); err != nil {
 				return fmt.Errorf("failed to push state to HA webhook: %w", err)
