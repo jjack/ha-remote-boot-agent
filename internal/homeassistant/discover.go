@@ -8,10 +8,7 @@ import (
 	"github.com/grandcat/zeroconf"
 )
 
-const (
-	homeAssistantService    = "_home-assistant._tcp"
-	homeAssistantDefaultURL = "http://homeassistant.local:8123"
-)
+const homeAssistantService = "_home-assistant._tcp"
 
 const discoveryTimeout = 3 * time.Second
 
@@ -50,6 +47,6 @@ func Discover() (string, error) {
 	case url := <-found:
 		return url, nil
 	case <-ctx.Done():
-		return homeAssistantDefaultURL, nil
+		return "", nil
 	}
 }
