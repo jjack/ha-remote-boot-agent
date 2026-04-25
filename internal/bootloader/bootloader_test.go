@@ -44,7 +44,7 @@ func TestExampleBootloader(t *testing.T) {
 		t.Error("expected example bootloader to be active")
 	}
 
-	bootOptions, err := bl.GetBootOptions("")
+	bootOptions, err := bl.GetBootOptions(Config{})
 	if err != nil {
 		t.Fatalf("expected no error from example GetBootOptions relative to config path, got %v", err)
 	}

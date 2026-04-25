@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 
+	"github.com/jjack/remote-boot-agent/internal/bootloader"
 	"github.com/spf13/cobra"
 )
 
@@ -18,7 +19,9 @@ func NewListCmd(deps *CommandDeps) *cobra.Command {
 
 			fmt.Printf("Bootloader: %s\n", bl.Name())
 
-			bootOptions, err := bl.GetBootOptions(deps.Config.Bootloader.ConfigPath)
+			bootOptions, err := bl.GetBootOptions(bootloader.Config{
+				ConfigPath: deps.Config.Bootloader.ConfigPath,
+			})
 			if err != nil {
 				return fmt.Errorf("failed to get boot options from bootloader %s: %w", bl.Name(), err)
 			}

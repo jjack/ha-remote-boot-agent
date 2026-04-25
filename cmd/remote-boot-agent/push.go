@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log/slog"
 
+	"github.com/jjack/remote-boot-agent/internal/bootloader"
 	ha "github.com/jjack/remote-boot-agent/internal/homeassistant"
 
 	"github.com/spf13/cobra"
@@ -20,7 +21,9 @@ func NewPushCmd(deps *CommandDeps) *cobra.Command {
 			}
 
 			blCfg := deps.Config.Bootloader
-			bootOptions, err := bl.GetBootOptions(blCfg.ConfigPath)
+			bootOptions, err := bl.GetBootOptions(bootloader.Config{
+				ConfigPath: blCfg.ConfigPath,
+			})
 			if err != nil {
 				return fmt.Errorf("failed to get boot options: %w", err)
 			}

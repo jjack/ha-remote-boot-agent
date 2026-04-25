@@ -5,9 +5,13 @@ import (
 	"sort"
 )
 
+type Config struct {
+	ConfigPath string
+}
+
 type Bootloader interface {
 	IsActive() bool
-	GetBootOptions(configPath string) ([]string, error)
+	GetBootOptions(cfg Config) ([]string, error)
 	Name() string
 }
 
