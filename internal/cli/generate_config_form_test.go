@@ -20,6 +20,13 @@ func TestGenerateConfigForm_ConstructsConfig(t *testing.T) {
 			URL:       hassURL,
 			WebhookID: "webhookid",
 		},
+		Bootloader: config.BootloaderConfig{
+			Name:       "grub",
+			ConfigPath: "",
+		},
+		InitSystem: config.InitSystemConfig{
+			Name: "systemd",
+		},
 	}
 
 	if cfg.Host.MACAddress != "00:11:22:33:44:55" {
@@ -30,5 +37,11 @@ func TestGenerateConfigForm_ConstructsConfig(t *testing.T) {
 	}
 	if cfg.HomeAssistant.URL != hassURL {
 		t.Errorf("expected HomeAssistant.URL to be %s, got %s", hassURL, cfg.HomeAssistant.URL)
+	}
+	if cfg.Bootloader.Name != "grub" {
+		t.Errorf("expected Bootloader.Name to be grub, got %s", cfg.Bootloader.Name)
+	}
+	if cfg.InitSystem.Name != "systemd" {
+		t.Errorf("expected InitSystem.Name to be systemd, got %s", cfg.InitSystem.Name)
 	}
 }

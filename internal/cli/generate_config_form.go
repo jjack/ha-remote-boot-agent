@@ -10,11 +10,16 @@ func GenerateConfigForm(
 	hostname string,
 	hassURL string,
 	interfaceOptions []system.InterfaceInfo,
+	defaultBootloader string,
+	defaultInitSystem string,
 ) (cfg *config.Config, err error) {
 	macAddress := ""
 	finalHassURL := hassURL
 	webhookID := ""
 	finalHostname := hostname
+	blName := defaultBootloader
+	blPath := ""
+	initSysName := defaultInitSystem
 
 	var ifaceOpts []huh.Option[string]
 	for _, opt := range interfaceOptions {
@@ -39,6 +44,21 @@ func GenerateConfigForm(
 				Validate(func(v string) error {
 					return config.ValidateMACAddress(v)
 				}),
+		),
+		huh.NewGroup(
+			huh.NewInput().
+				Title("Bootloader").
+				Placeholder("grub").
+				Value(&blName),
+			huh.NewInput().
+				Title("Bootloader Config Path").
+				Description("Leave blank to auto-detect").
+				Placeholder("/boot/grub/grub.cfg").
+				Value(&blPath),
+			huh.NewInput().
+				Title("Init System").
+				Placeholder("systemd").
+				Value(&initSysName),
 		),
 		huh.NewGroup(
 			huh.NewInput().
@@ -72,6 +92,13 @@ func GenerateConfigForm(
 		HomeAssistant: config.HomeAssistantConfig{
 			URL:       finalHassURL,
 			WebhookID: webhookID,
+		},
+		Bootloader: config.BootloaderConfig{
+			Name:       blName,
+			ConfigPath: blPath,
+		},
+		InitSystem: config.InitSystemConfig{
+			Name: initSysName,
 		},
 	}
 	return cfg, nil

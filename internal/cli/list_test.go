@@ -30,7 +30,7 @@ func TestGetBootOptionsCommand(t *testing.T) {
 	registry := bootloader.NewRegistry()
 	registry.Register("example", func() bootloader.Bootloader { return &mockListBootloader{} })
 
-	deps := &CommandDeps{Config: cfg, Registry: registry}
+	deps := &CommandDeps{Config: cfg, BootloaderRegistry: registry}
 	cmd := NewListCmd(deps)
 
 	// Intercept stdout
@@ -79,7 +79,7 @@ func TestGetBootOptionsCommand_BootloaderError(t *testing.T) {
 	registry := bootloader.NewRegistry()
 	registry.Register("err", func() bootloader.Bootloader { return &mockListBootloaderErr{} })
 
-	deps := &CommandDeps{Config: cfg, Registry: registry}
+	deps := &CommandDeps{Config: cfg, BootloaderRegistry: registry}
 	cmd := NewListCmd(deps)
 	err := cmd.Execute()
 
@@ -109,7 +109,7 @@ func TestGetBootOptionsCommand_EmptyOptions(t *testing.T) {
 	registry := bootloader.NewRegistry()
 	registry.Register("empty", func() bootloader.Bootloader { return &mockListBootloaderEmpty{} })
 
-	deps := &CommandDeps{Config: cfg, Registry: registry}
+	deps := &CommandDeps{Config: cfg, BootloaderRegistry: registry}
 	cmd := NewListCmd(deps)
 
 	oldStdout := os.Stdout
@@ -136,7 +136,7 @@ func TestGetBootOptionsCommand_UnknownBootloader(t *testing.T) {
 
 	registry := bootloader.NewRegistry() // Empty registry for unknown bootloader
 
-	deps := &CommandDeps{Config: cfg, Registry: registry}
+	deps := &CommandDeps{Config: cfg, BootloaderRegistry: registry}
 	cmd := NewListCmd(deps)
 	err := cmd.Execute()
 

@@ -2,6 +2,7 @@ package cli
 
 import (
 	"fmt"
+	"strings"
 
 	"charm.land/huh/v2/spinner"
 	"github.com/jjack/remote-boot-agent/internal/config"
@@ -11,7 +12,7 @@ import (
 )
 
 // NewGenerateConfigCmd walks the user through generating a config interactively
-func NewGenerateConfigCmd() *cobra.Command {
+func NewGenerateConfigCmd(deps *CommandDeps) *cobra.Command {
 	return &cobra.Command{
 		Use:   "generate-config",
 		Short: "Interactively generate a config file",
@@ -38,7 +39,23 @@ func NewGenerateConfigCmd() *cobra.Command {
 				return err
 			}
 
-			cfg, err := GenerateConfigForm(hostname, hassURL, interfaces)
+			bl, err := deps.BootloaderRegistry.Detect(cmd.Context())
+			if err != nil {
+				if err.Error() == "no supported bootloader detected" {
+					supported := strings.Join(deps.BootloaderRegistry.SupportedBootloaders(), ", ")
+					return fmt.Errorf("no supported bootloader detected. Please ensure you have one of the following installed: %s", supported)
+				}
+				return err
+			}
+
+			sys, err := deps.InitRegistry.Detect(cmd.Context())
+			if err != nil {
+				return err
+			}
+
+			cfg, err := GenerateConfigForm(
+				hostname, hassURL, interfaces, bl.Name(), sys.Name(),
+			)
 			if err != nil {
 				return err
 			}
@@ -47,6 +64,8 @@ func NewGenerateConfigCmd() *cobra.Command {
 			fmt.Printf("---\n")
 			fmt.Printf("host:\n  hostname: %s\n  mac: %s\n", cfg.Host.Hostname, cfg.Host.MACAddress)
 			fmt.Printf("homeassistant:\n  url: %s\n  webhook_id: %s\n", cfg.HomeAssistant.URL, cfg.HomeAssistant.WebhookID)
+			fmt.Printf("bootloader:\n  name: %s\n  config_path: %s\n", cfg.Bootloader.Name, cfg.Bootloader.ConfigPath)
+			fmt.Printf("initsystem:\n  name: %s\n", cfg.InitSystem.Name)
 
 			return config.Save(cfg, "./config.yaml")
 		},
