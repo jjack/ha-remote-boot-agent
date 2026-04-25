@@ -2,10 +2,13 @@ host:
   mac_address: "00:11:22:33:44:55"
   hostname:    "my-remote-pc"
 
+homeassistant:
+  url: "https://homeassistant.local:8123"
+  webhook_id: "your-generated-webhook-id"
+
 bootloader:
   name: "grub"
   config_path: "/boot/grub/grub.cfg"
 
-homeassistant:
-  url: "https://homeassistant.local:8123"
-  webhook_id: "your-generated-webhook-id"
+initsystem:
+  name: "systemd"

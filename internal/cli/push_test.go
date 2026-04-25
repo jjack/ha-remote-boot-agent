@@ -62,7 +62,7 @@ func TestPushBootOptionsCommand(t *testing.T) {
 	registry := bootloader.NewRegistry()
 	registry.Register("grub", bootloader.NewGrub)
 
-	deps := &CommandDeps{Config: cfg, Registry: registry}
+	deps := &CommandDeps{Config: cfg, BootloaderRegistry: registry}
 	cmd := NewPushCmd(deps)
 	if err := cmd.Execute(); err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -100,7 +100,7 @@ func TestPushBootOptionsCommand_BootloaderError(t *testing.T) {
 	registry := bootloader.NewRegistry()
 	registry.Register("err", func() bootloader.Bootloader { return &mockPushBootloaderErr{} })
 
-	deps := &CommandDeps{Config: cfg, Registry: registry}
+	deps := &CommandDeps{Config: cfg, BootloaderRegistry: registry}
 	cmd := NewPushCmd(deps)
 	err := cmd.Execute()
 
@@ -133,7 +133,7 @@ func TestPushBootOptionsCommand_HAClientError(t *testing.T) {
 	registry := bootloader.NewRegistry()
 	registry.Register("mock", func() bootloader.Bootloader { return &mockPushBootloader{} })
 
-	deps := &CommandDeps{Config: cfg, Registry: registry}
+	deps := &CommandDeps{Config: cfg, BootloaderRegistry: registry}
 	cmd := NewPushCmd(deps)
 	err := cmd.Execute()
 
@@ -157,7 +157,7 @@ func TestPushBootOptionsCommand_MissingHAConfig(t *testing.T) {
 	registry := bootloader.NewRegistry()
 	registry.Register("grub", bootloader.NewGrub)
 
-	deps := &CommandDeps{Config: cfg, Registry: registry}
+	deps := &CommandDeps{Config: cfg, BootloaderRegistry: registry}
 	cmd := NewPushCmd(deps)
 	err := cmd.Execute()
 	if err == nil {
@@ -177,7 +177,7 @@ func TestPushBootOptionsCommand_UnknownBootloader(t *testing.T) {
 
 	registry := bootloader.NewRegistry()
 
-	deps := &CommandDeps{Config: cfg, Registry: registry}
+	deps := &CommandDeps{Config: cfg, BootloaderRegistry: registry}
 	cmd := NewPushCmd(deps)
 	err := cmd.Execute()
 	if err == nil {

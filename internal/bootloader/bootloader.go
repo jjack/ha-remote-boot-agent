@@ -55,3 +55,12 @@ func (r *Registry) Detect(ctx context.Context) (Bootloader, error) {
 	}
 	return nil, fmt.Errorf("no supported bootloader detected")
 }
+
+func (r *Registry) SupportedBootloaders() []string {
+	var names []string
+	for name := range r.bootloaders {
+		names = append(names, name)
+	}
+	sort.Strings(names)
+	return names
+}

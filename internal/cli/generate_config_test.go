@@ -5,7 +5,7 @@ import (
 )
 
 func TestNewGenerateConfigCmd(t *testing.T) {
-	cmd := NewGenerateConfigCmd()
+	cmd := NewGenerateConfigCmd(&CommandDeps{})
 
 	if cmd.Use != "generate-config" {
 		t.Errorf("expected Use 'generate-config', got %s", cmd.Use)

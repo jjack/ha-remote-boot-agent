@@ -12,12 +12,17 @@ import (
 type Config struct {
 	Host          HostConfig          `mapstructure:"host"`
 	Bootloader    BootloaderConfig    `mapstructure:"bootloader"`
+	InitSystem    InitSystemConfig    `mapstructure:"initsystem"`
 	HomeAssistant HomeAssistantConfig `mapstructure:"homeassistant"`
 }
 
 type BootloaderConfig struct {
 	Name       string `mapstructure:"name"`
 	ConfigPath string `mapstructure:"config_path"`
+}
+
+type InitSystemConfig struct {
+	Name string `mapstructure:"name"`
 }
 
 type HostConfig struct {
@@ -43,6 +48,7 @@ func Load(cfgFile string, flags *pflag.FlagSet) (*Config, error) {
 		_ = v.BindPFlag("host.hostname", flags.Lookup("hostname"))
 		_ = v.BindPFlag("bootloader.name", flags.Lookup("bootloader"))
 		_ = v.BindPFlag("bootloader.config_path", flags.Lookup("bootloader-path"))
+		_ = v.BindPFlag("initsystem.name", flags.Lookup("init-system"))
 		_ = v.BindPFlag("homeassistant.url", flags.Lookup("hass-url"))
 		_ = v.BindPFlag("homeassistant.webhook_id", flags.Lookup("hass-webhook"))
 	}
@@ -65,6 +71,9 @@ func Save(cfg *Config, path string) error {
 	v := viper.New()
 	v.Set("host.mac_address", cfg.Host.MACAddress)
 	v.Set("host.hostname", cfg.Host.Hostname)
+	v.Set("bootloader.name", cfg.Bootloader.Name)
+	v.Set("bootloader.config_path", cfg.Bootloader.ConfigPath)
+	v.Set("initsystem.name", cfg.InitSystem.Name)
 	v.Set("homeassistant.url", cfg.HomeAssistant.URL)
 	v.Set("homeassistant.webhook_id", cfg.HomeAssistant.WebhookID)
 
