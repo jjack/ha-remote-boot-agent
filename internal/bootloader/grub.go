@@ -9,6 +9,11 @@ import (
 	"strings"
 )
 
+const (
+	initialBufferSize = 64 * 1024   // 64KB
+	maxBufferCapacity = 1024 * 1024 // 1MB
+)
+
 const grubBootloader = "grub"
 
 var grubPaths = []string{
@@ -75,6 +80,10 @@ func (g *Grub) NewGetBootOptions(configPath string) ([]string, error) {
 	scanner := bufio.NewScanner(file)
 	// Match lines like: menuentry 'Ubuntu' ... or menuentry "Windows" ...
 	re := regexp.MustCompile(`^menuentry\s+['"]([^'"]+)['"]`)
+
+	// Create a custom buffer (initial size 64KB, max size 1MB)
+	buf := make([]byte, initialBufferSize)
+	scanner.Buffer(buf, maxBufferCapacity)
 
 	for scanner.Scan() {
 		line := strings.TrimSpace(scanner.Text())
