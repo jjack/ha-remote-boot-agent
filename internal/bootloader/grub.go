@@ -105,6 +105,9 @@ func (g *Grub) GetBootOptions(cfg Config) ([]string, error) {
 
 	file, err := os.Open(grubPath)
 	if err != nil {
+		if os.IsPermission(err) {
+			return nil, fmt.Errorf("permission denied reading grub config %s (are you running as root?)", grubPath)
+		}
 		return nil, fmt.Errorf("failed to open grub config %s: %w", grubPath, err)
 	}
 	defer func() { _ = file.Close() }()
