@@ -48,14 +48,14 @@ func findGrubConfig() (string, error) {
 	return "", fmt.Errorf("no grub config found in known locations")
 }
 
-func (g *Grub) GetBootOptions(configPath string) ([]string, error) {
+func (g *Grub) GetBootOptions(cfg Config) ([]string, error) {
 	slog.Debug("Parsing GRUB boot options...")
 
 	var grubPath string
 	var err error
 
-	if configPath != "" {
-		grubPath = configPath
+	if cfg.ConfigPath != "" {
+		grubPath = cfg.ConfigPath
 		slog.Debug("Using explicit GRUB config path", slog.String("path", grubPath))
 	} else {
 		grubPath, err = findGrubConfig()

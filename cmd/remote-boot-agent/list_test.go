@@ -14,7 +14,7 @@ type mockListBootloader struct{}
 
 func (m *mockListBootloader) Name() string   { return "example" }
 func (m *mockListBootloader) IsActive() bool { return true }
-func (m *mockListBootloader) GetBootOptions(configPath string) ([]string, error) {
+func (m *mockListBootloader) GetBootOptions(cfg bootloader.Config) ([]string, error) {
 	return []string{"Ubuntu", "Windows"}, nil
 }
 
