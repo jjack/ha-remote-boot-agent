@@ -1,7 +1,9 @@
 server:
-  mac_address: "00:11:22:33:44:55"
   name:        "my-remote-pc"
   host:        "my-remote-pc"
+  mac_address: "00:11:22:33:44:55"
+  broadcast_address: "255.255.255.255"
+  broadcast_port: 9
 
 homeassistant:
   url: "https://homeassistant.local:8123"
