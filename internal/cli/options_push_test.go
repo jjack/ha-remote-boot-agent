@@ -45,11 +45,13 @@ func TestPushBootOptionsCommand(t *testing.T) {
 
 	tempGrubPath := createTempGrubConfig(t)
 	cfg := &config.Config{
-		Host: config.HostConfig{
+		Server: config.ServerConfig{
 			MACAddress:       "aa:bb:cc:dd:ee:ff",
 			BroadcastAddress: "192.168.1.255",
 			BroadcastPort:    9,
-			Hostname:         "test-host",
+			Name:             "test-name",
+			Server:           "test-host",
+			EntityType:       config.EntityTypeButton,
 		},
 		Bootloader: config.BootloaderConfig{
 			Name:       "grub",
@@ -79,8 +81,14 @@ func TestPushBootOptionsCommand(t *testing.T) {
 	if payload.BroadcastPort != 9 {
 		t.Errorf("expected WOL port 9, got %d", payload.BroadcastPort)
 	}
-	if payload.Hostname != "test-host" {
-		t.Errorf("expected hostname test-host, got %s", payload.Hostname)
+	if payload.Name != "test-name" {
+		t.Errorf("expected name test-name, got %s", payload.Name)
+	}
+	if payload.Server != "test-host" {
+		t.Errorf("expected host test-host, got %s", payload.Server)
+	}
+	if payload.EntityType != "button" {
+		t.Errorf("expected entity type button, got %s", payload.EntityType)
 	}
 	if payload.Bootloader != "grub" {
 		t.Errorf("expected bootloader grub, got %s", payload.Bootloader)

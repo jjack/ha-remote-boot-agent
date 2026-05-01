@@ -11,9 +11,11 @@ func TestConfig_SaveAndLoad(t *testing.T) {
 	cfgPath := filepath.Join(tempDir, "config.yaml")
 
 	cfg := &Config{
-		Host: HostConfig{
+		Server: ServerConfig{
 			MACAddress:       "00:11:22:33:44:55",
-			Hostname:         "test-host",
+			Name:             "Test Server",
+			Server:           "test-host",
+			EntityType:       EntityTypeButton,
 			BroadcastAddress: "192.168.1.255",
 			BroadcastPort:    9,
 		},
@@ -46,8 +48,8 @@ func TestConfig_SaveAndLoad(t *testing.T) {
 		t.Fatalf("failed to load config: %v", err)
 	}
 
-	if loadedCfg.Host.MACAddress != cfg.Host.MACAddress {
-		t.Errorf("expected MAC %s, got %s", cfg.Host.MACAddress, loadedCfg.Host.MACAddress)
+	if loadedCfg.Server.MACAddress != cfg.Server.MACAddress {
+		t.Errorf("expected MAC %s, got %s", cfg.Server.MACAddress, loadedCfg.Server.MACAddress)
 	}
 	if loadedCfg.Bootloader.ConfigPath != cfg.Bootloader.ConfigPath {
 		t.Errorf("expected Bootloader path %s, got %s", cfg.Bootloader.ConfigPath, loadedCfg.Bootloader.ConfigPath)

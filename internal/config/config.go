@@ -8,8 +8,15 @@ import (
 	"github.com/spf13/viper"
 )
 
+type EntityType string
+
+const (
+	EntityTypeButton EntityType = "button"
+	EntityTypeSwitch EntityType = "switch"
+)
+
 type Config struct {
-	Host          HostConfig          `mapstructure:"host"`
+	Server        ServerConfig        `mapstructure:"host"`
 	Bootloader    BootloaderConfig    `mapstructure:"bootloader"`
 	InitSystem    InitSystemConfig    `mapstructure:"initsystem"`
 	HomeAssistant HomeAssistantConfig `mapstructure:"homeassistant"`
@@ -24,11 +31,13 @@ type InitSystemConfig struct {
 	Name string `mapstructure:"name"`
 }
 
-type HostConfig struct {
-	MACAddress       string `mapstructure:"mac_address"`
-	Hostname         string `mapstructure:"hostname"`
-	BroadcastAddress string `mapstructure:"broadcast_address"`
-	BroadcastPort    int    `mapstructure:"broadcast_port"`
+type ServerConfig struct {
+	EntityType       EntityType `mapstructure:"entity_type"`
+	Server           string     `mapstructure:"host"`
+	MACAddress       string     `mapstructure:"mac_address"`
+	Name             string     `mapstructure:"name"`
+	BroadcastAddress string     `mapstructure:"broadcast_address"`
+	BroadcastPort    int        `mapstructure:"broadcast_port"`
 }
 
 type HomeAssistantConfig struct {
@@ -48,7 +57,9 @@ func Load(cfgFile string, flags *pflag.FlagSet) (*Config, error) {
 
 	if flags != nil {
 		_ = v.BindPFlag("host.mac_address", flags.Lookup("mac"))
-		_ = v.BindPFlag("host.hostname", flags.Lookup("hostname"))
+		_ = v.BindPFlag("host.name", flags.Lookup("name"))
+		_ = v.BindPFlag("host.host", flags.Lookup("host"))
+		_ = v.BindPFlag("host.entity_type", flags.Lookup("entity-type"))
 		_ = v.BindPFlag("host.broadcast_address", flags.Lookup("broadcast-address"))
 		_ = v.BindPFlag("host.broadcast_port", flags.Lookup("wol-port"))
 		_ = v.BindPFlag("bootloader.name", flags.Lookup("bootloader"))
@@ -74,10 +85,12 @@ func Load(cfgFile string, flags *pflag.FlagSet) (*Config, error) {
 
 func Save(cfg *Config, path string) error {
 	v := viper.New()
-	v.Set("host.mac_address", cfg.Host.MACAddress)
-	v.Set("host.hostname", cfg.Host.Hostname)
-	v.Set("host.broadcast_address", cfg.Host.BroadcastAddress)
-	v.Set("host.broadcast_port", cfg.Host.BroadcastPort)
+	v.Set("host.mac_address", cfg.Server.MACAddress)
+	v.Set("host.name", cfg.Server.Name)
+	v.Set("host.host", cfg.Server.Server)
+	v.Set("host.entity_type", cfg.Server.EntityType)
+	v.Set("host.broadcast_address", cfg.Server.BroadcastAddress)
+	v.Set("host.broadcast_port", cfg.Server.BroadcastPort)
 	v.Set("bootloader.name", cfg.Bootloader.Name)
 	v.Set("bootloader.config_path", cfg.Bootloader.ConfigPath)
 	v.Set("initsystem.name", cfg.InitSystem.Name)

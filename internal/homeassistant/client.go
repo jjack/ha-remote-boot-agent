@@ -22,7 +22,9 @@ type PushPayload struct {
 	MACAddress       string   `json:"mac"`
 	BroadcastAddress string   `json:"broadcast_address"`
 	BroadcastPort    int      `json:"broadcast_port"`
-	Hostname         string   `json:"hostname"`
+	Name             string   `json:"name"`
+	Server           string   `json:"host"`
+	EntityType       string   `json:"entity_type"`
 	Bootloader       string   `json:"bootloader"`
 	BootOptions      []string `json:"boot_options"`
 }

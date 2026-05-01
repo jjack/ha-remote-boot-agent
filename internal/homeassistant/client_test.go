@@ -36,7 +36,9 @@ func TestClient_Push(t *testing.T) {
 	client := NewClient(ts.URL, "test-webhook", nil)
 	payload := PushPayload{
 		MACAddress:       "aa:bb:cc:dd",
-		Hostname:         "test-host",
+		Name:             "test-name",
+		Server:           "test-host",
+		EntityType:       "button",
 		Bootloader:       "grub",
 		BootOptions:      []string{"Ubuntu", "Windows"},
 		BroadcastAddress: "192.168.1.255",

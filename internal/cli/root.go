@@ -68,7 +68,9 @@ func NewCLI() *CLI {
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "./config.yaml", "config file")
 	rootCmd.PersistentFlags().String("mac", "", "MAC Address override")
-	rootCmd.PersistentFlags().String("hostname", "", "Hostname override")
+	rootCmd.PersistentFlags().String("name", "", "Name override")
+	rootCmd.PersistentFlags().String("host", "", "Server override")
+	rootCmd.PersistentFlags().String("entity-type", "", "Entity type override")
 	rootCmd.PersistentFlags().String("broadcast-address", "", "Broadcast address override for WOL")
 	rootCmd.PersistentFlags().Int("wol-port", 9, "Broadcast port override for WOL")
 	rootCmd.PersistentFlags().String("bootloader", "", "Bootloader type override (e.g., grub)")

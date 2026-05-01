@@ -40,24 +40,56 @@ func surveyValidator(valFunc func(string) error) survey.Validator {
 	}
 }
 
-func askHostConfig() (config.HostConfig, error) {
+func askHostConfig() (config.ServerConfig, error) {
 	hostname, err := detectSystemHostname()
 	if err != nil {
-		return config.HostConfig{}, err
+		return config.ServerConfig{}, err
 	}
 
-	var finalHostname string
+	var finalName string
 	err = surveyAskOne(&survey.Input{
-		Message: "Hostname (how Home Assistant will refer to your machine):",
+		Message: "Name (how Home Assistant will refer to your machine):",
 		Default: hostname,
-	}, &finalHostname, survey.WithValidator(surveyValidator(config.ValidateHostname)))
+	}, &finalName)
 	if err != nil {
-		return config.HostConfig{}, err
+		return config.ServerConfig{}, err
+	}
+
+	var hostChoice string
+	err = surveyAskOne(&survey.Select{
+		Message: "Server format for ping checks (Warning: If you choose IP, it must be static):",
+		Options: []string{"Hostname", "IP Address"},
+		Default: "Hostname",
+	}, &hostChoice)
+	if err != nil {
+		return config.ServerConfig{}, err
+	}
+
+	var finalHost string
+	if hostChoice == "Hostname" {
+		finalHost = hostname
+	} else {
+		err = surveyAskOne(&survey.Input{
+			Message: "Enter static IP address:",
+		}, &finalHost)
+		if err != nil {
+			return config.ServerConfig{}, err
+		}
+	}
+
+	var entityType string
+	err = surveyAskOne(&survey.Select{
+		Message: "Home Assistant Entity Type:",
+		Options: []string{"button", "switch"},
+		Default: "button",
+	}, &entityType)
+	if err != nil {
+		return config.ServerConfig{}, err
 	}
 
 	interfaceOptions, err := getSystemInterfaces()
 	if err != nil {
-		return config.HostConfig{}, err
+		return config.ServerConfig{}, err
 	}
 
 	var ifaceOptions []string
@@ -73,12 +105,12 @@ func askHostConfig() (config.HostConfig, error) {
 		Options: ifaceOptions,
 	}, &selectedIfaceLabel)
 	if err != nil {
-		return config.HostConfig{}, err
+		return config.ServerConfig{}, err
 	}
 
 	macAddress := ifaceMap[selectedIfaceLabel]
 	if err := config.ValidateMACAddress(macAddress); err != nil {
-		return config.HostConfig{}, err
+		return config.ServerConfig{}, err
 	}
 
 	broadcastAddrs, _ := systemGetBroadcastAddresses(macAddress)
@@ -92,7 +124,7 @@ func askHostConfig() (config.HostConfig, error) {
 				Options: broadcastAddrs,
 			}, &chosenBroadcast)
 			if err != nil {
-				return config.HostConfig{}, err
+				return config.ServerConfig{}, err
 			}
 		}
 	}
@@ -103,7 +135,7 @@ func askHostConfig() (config.HostConfig, error) {
 		Default: chosenBroadcast,
 	}, &finalBroadcast)
 	if err != nil {
-		return config.HostConfig{}, err
+		return config.ServerConfig{}, err
 	}
 
 	var wolPortStr string
@@ -111,7 +143,7 @@ func askHostConfig() (config.HostConfig, error) {
 		Message: "Wake-on-LAN Port (leave blank for default):",
 	}, &wolPortStr, survey.WithValidator(surveyValidator(config.ValidateBroadcastPort)))
 	if err != nil {
-		return config.HostConfig{}, err
+		return config.ServerConfig{}, err
 	}
 
 	wolPort, _ := strconv.Atoi(wolPortStr)
@@ -119,8 +151,10 @@ func askHostConfig() (config.HostConfig, error) {
 		wolPort = 9
 	}
 
-	return config.HostConfig{
-		Hostname:         finalHostname,
+	return config.ServerConfig{
+		Name:             finalName,
+		Server:           finalHost,
+		EntityType:       config.EntityType(entityType),
 		MACAddress:       macAddress,
 		BroadcastAddress: finalBroadcast,
 		BroadcastPort:    wolPort,
@@ -225,7 +259,7 @@ func generateConfigInteractive(ctx context.Context, deps *CommandDeps) (*config.
 	}
 
 	return &config.Config{
-		Host:          hostCfg,
+		Server:        hostCfg,
 		Bootloader:    blCfg,
 		InitSystem:    initCfg,
 		HomeAssistant: haCfg,
@@ -270,7 +304,7 @@ func NewConfigGenerateCmd(deps *CommandDeps) *cobra.Command {
 
 			fmt.Println("\nGenerated config (keys may be in a different order than shown here):")
 			fmt.Printf("---\n")
-			fmt.Printf("host:\n  hostname: %s\n  mac_address: %s\n  broadcast_address: %s\n  broadcast_port: %d\n", cfg.Host.Hostname, cfg.Host.MACAddress, cfg.Host.BroadcastAddress, cfg.Host.BroadcastPort)
+			fmt.Printf("host:\n  name: %s\n  host: %s\n  entity_type: %s\n  mac_address: %s\n  broadcast_address: %s\n  broadcast_port: %d\n", cfg.Server.Name, cfg.Server.Server, cfg.Server.EntityType, cfg.Server.MACAddress, cfg.Server.BroadcastAddress, cfg.Server.BroadcastPort)
 			fmt.Printf("homeassistant:\n  url: %s\n  webhook_id: %s\n", cfg.HomeAssistant.URL, cfg.HomeAssistant.WebhookID)
 			fmt.Printf("bootloader:\n  name: %s\n  config_path: %s\n", cfg.Bootloader.Name, cfg.Bootloader.ConfigPath)
 			fmt.Printf("initsystem:\n  name: %s\n", cfg.InitSystem.Name)

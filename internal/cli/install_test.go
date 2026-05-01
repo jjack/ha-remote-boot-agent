@@ -49,7 +49,7 @@ func (m *mockInstallInitSystem) Install(ctx context.Context, configPath string) 
 
 func TestInstallCmd_Success(t *testing.T) {
 	cfg := &config.Config{
-		Host: config.HostConfig{
+		Server: config.ServerConfig{
 			MACAddress: "aa:bb:cc:dd:ee:ff",
 		},
 		HomeAssistant: config.HomeAssistantConfig{

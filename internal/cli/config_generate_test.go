@@ -249,8 +249,10 @@ func buildMockSurveyAskOne(triggerErrorOn string) func(survey.Prompt, interface{
 		switch pt := p.(type) {
 		case *survey.Input:
 			switch pt.Message {
-			case "Hostname (how Home Assistant will refer to your machine):":
+			case "Name (how Home Assistant will refer to your machine):":
 				*(response.(*string)) = "my-host"
+			case "Enter static IP address:":
+				*(response.(*string)) = "192.168.1.100"
 			case "WOL Broadcast Address:":
 				*(response.(*string)) = "192.168.1.255"
 			case "Wake-on-LAN Port (leave blank for default):":
@@ -264,6 +266,10 @@ func buildMockSurveyAskOne(triggerErrorOn string) func(survey.Prompt, interface{
 			}
 		case *survey.Select:
 			switch pt.Message {
+			case "Server format for ping checks (Warning: If you choose IP, it must be static):":
+				*(response.(*string)) = "Hostname"
+			case "Home Assistant Entity Type:":
+				*(response.(*string)) = "button"
 			case "Select Physical WOL Interface":
 				*(response.(*string)) = "eth0"
 			case "Multiple WOL Subnet/Broadcast Addresses were discovered. Please select one:":
@@ -312,14 +318,20 @@ func TestGenerateConfigSurvey_Success(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	if cfg.Host.Hostname != "my-host" {
-		t.Errorf("expected hostname my-host, got %s", cfg.Host.Hostname)
+	if cfg.Server.Name != "my-host" {
+		t.Errorf("expected name my-host, got %s", cfg.Server.Name)
 	}
-	if cfg.Host.BroadcastAddress != "192.168.1.255" {
-		t.Errorf("expected BroadcastAddress 192.168.1.255, got %s", cfg.Host.BroadcastAddress)
+	if cfg.Server.Server != "detected-host" {
+		t.Errorf("expected host detected-host, got %s", cfg.Server.Server)
 	}
-	if cfg.Host.BroadcastPort != 9 {
-		t.Errorf("expected BroadcastPort 9 (fallback), got %d", cfg.Host.BroadcastPort)
+	if cfg.Server.EntityType != config.EntityTypeButton {
+		t.Errorf("expected entity type button, got %s", cfg.Server.EntityType)
+	}
+	if cfg.Server.BroadcastAddress != "192.168.1.255" {
+		t.Errorf("expected BroadcastAddress 192.168.1.255, got %s", cfg.Server.BroadcastAddress)
+	}
+	if cfg.Server.BroadcastPort != 9 {
+		t.Errorf("expected BroadcastPort 9 (fallback), got %d", cfg.Server.BroadcastPort)
 	}
 	if cfg.HomeAssistant.URL != "http://hass.local:8123" {
 		t.Errorf("expected URL http://hass.local:8123, got %s", cfg.HomeAssistant.URL)
@@ -349,7 +361,9 @@ func TestGenerateConfigSurvey_AskOneErrors(t *testing.T) {
 
 	deps := setupSurveyDeps()
 	errorSteps := []string{
-		"Hostname (how Home Assistant will refer to your machine):",
+		"Name (how Home Assistant will refer to your machine):",
+		"Server format for ping checks (Warning: If you choose IP, it must be static):",
+		"Home Assistant Entity Type:",
 		"Select Physical WOL Interface",
 		"WOL Broadcast Address:",
 		"Wake-on-LAN Port (leave blank for default):",

@@ -41,9 +41,9 @@ func TestValidateHostname(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := ValidateHostname(tt.host)
+			err := ValidateHost(tt.host)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("ValidateHostname() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("ValidateHost() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}
@@ -88,11 +88,33 @@ func TestValidateWebhookID(t *testing.T) {
 	}
 }
 
+func TestValidateEntityType(t *testing.T) {
+	tests := []struct {
+		name    string
+		etype   EntityType
+		wantErr bool
+	}{
+		{"valid button", EntityTypeButton, false},
+		{"valid switch", EntityTypeSwitch, false},
+		{"empty", "", true},
+		{"invalid type", EntityType("sensor"), true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := ValidateEntityType(tt.etype); (err != nil) != tt.wantErr {
+				t.Errorf("ValidateEntityType() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
 func TestConfigValidate(t *testing.T) {
 	cfg := &Config{
-		Host: HostConfig{
+		Server: ServerConfig{
 			MACAddress:       "00:11:22:33:44:55",
-			Hostname:         "test-host",
+			Name:             "Test Server",
+			EntityType:       EntityTypeButton,
+			Server:             "test-host",
 			BroadcastAddress: "192.168.1.255",
 			BroadcastPort:    9,
 		},
@@ -105,7 +127,7 @@ func TestConfigValidate(t *testing.T) {
 		t.Errorf("expected valid config, got %v", err)
 	}
 
-	cfg.Host.MACAddress = "invalid"
+	cfg.Server.MACAddress = "invalid"
 	if err := cfg.Validate(); err == nil {
 		t.Error("expected error for invalid config")
 	}

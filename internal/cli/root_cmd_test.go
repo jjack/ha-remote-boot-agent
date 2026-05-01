@@ -3,6 +3,8 @@ package cli
 import (
 	"bytes"
 	"testing"
+
+	"github.com/jjack/remote-boot-agent/internal/config"
 )
 
 func TestCLI_PersistentPreRun(t *testing.T) {
@@ -16,7 +18,9 @@ func TestCLI_PersistentPreRun(t *testing.T) {
 		"list",
 		"--config", "../../config.sample.yaml",
 		"--mac", "aa:bb:cc:dd:ee:ff",
-		"--hostname", "override-host",
+		"--name", "override-name",
+		"--host", "override-host",
+		"--entity-type", "switch",
 		"--broadcast-address", "192.168.1.255",
 		"--wol-port", "7",
 		"--bootloader", "grub",
@@ -37,16 +41,22 @@ func TestCLI_PersistentPreRun(t *testing.T) {
 	}
 
 	// Verify all the overrides took effect in the config parsing layer
-	if cli.Config.Host.MACAddress != "aa:bb:cc:dd:ee:ff" {
+	if cli.Config.Server.MACAddress != "aa:bb:cc:dd:ee:ff" {
 		t.Errorf("mac not overridden")
 	}
-	if cli.Config.Host.Hostname != "override-host" {
+	if cli.Config.Server.Name != "override-name" {
+		t.Errorf("name not overridden")
+	}
+	if cli.Config.Server.Server != "override-host" {
 		t.Errorf("host not overridden")
 	}
-	if cli.Config.Host.BroadcastAddress != "192.168.1.255" {
+	if cli.Config.Server.EntityType != config.EntityTypeSwitch {
+		t.Errorf("entity type not overridden")
+	}
+	if cli.Config.Server.BroadcastAddress != "192.168.1.255" {
 		t.Errorf("broadcast address not overridden")
 	}
-	if cli.Config.Host.BroadcastPort != 7 {
+	if cli.Config.Server.BroadcastPort != 7 {
 		t.Errorf("wol port not overridden")
 	}
 	if cli.Config.Bootloader.Name != "grub" {
@@ -78,7 +88,9 @@ func TestCLI_PersistentPreRun_ConfigLoadFail(t *testing.T) {
 		"--bootloader", "grub",
 		"--bootloader-path", tempGrubPath,
 		"--mac", "00:11:22:33:44:55",
-		"--hostname", "test-host",
+		"--name", "test-name",
+		"--host", "test-host",
+		"--entity-type", "button",
 		"--hass-url", "http://test-ha.local",
 		"--hass-webhook", "test-webhook",
 	})

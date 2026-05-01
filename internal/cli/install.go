@@ -22,7 +22,7 @@ func NewInstallCmd(deps *CommandDeps) *cobra.Command {
 				return err
 			}
 
-			macAddress := deps.Config.Host.MACAddress
+			macAddress := deps.Config.Server.MACAddress
 			haURL := deps.Config.HomeAssistant.URL
 
 			cmd.Printf("Installing into bootloader: %s\n", bl.Name())
